@@ -1,16 +1,21 @@
 // timestamps (milliseconds)
 // 0 === January 1st 1970 (unix epoch)
 
+import moment from 'moment'
+
 // Get visible expenses
 
 export default (expenses, { text, sortBy, startDate, endDate }) => {
 	return expenses
 		.filter((expense) => {
+			const createdAtMoment = moment(expense.createdAt)
 			// if startDate/endDate is undefined, it shouldn't affect the return value
-			const startDateMatch =
-				typeof startDate !== 'number' || expense.createdAt >= startDate
-			const endDateMatch =
-				typeof endDate !== 'number' || expense.createdAt <= endDate
+			const startDateMatch = startDate
+				? startDate.isSameOrBefore(createdAtMoment, 'day')
+				: true
+			const endDateMatch = endDate
+				? endDate.isSameOrAfter(createdAtMoment, 'day')
+				: true
 			const textMatch = expense.description
 				.toLowerCase()
 				.includes(text.toLowerCase())
